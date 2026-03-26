@@ -23,7 +23,7 @@ class User(Base):
     created_at = Column(DateTime, server_default=func.now())
 
     voice_notes = relationship("VoiceNote", back_populates="user")
-    focus_blocks = relationship("FocusBlock", back_populates="user")
+    focus_blocks = relationship("FocusBlock", back_populates="user", foreign_keys="FocusBlock.user_id")
     active_focus_block = relationship("FocusBlock", foreign_keys=[active_focus_block_id])
     tasks = relationship("Task", back_populates="user")
     focus_sessions_hosted = relationship(
@@ -118,7 +118,7 @@ class FocusBlock(Base):
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-    user = relationship("User", back_populates="focus_blocks")
+    user = relationship("User", back_populates="focus_blocks", foreign_keys=[user_id])
 
 
 class FocusSession(Base):
