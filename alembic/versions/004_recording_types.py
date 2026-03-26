@@ -19,6 +19,10 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    is_pg = bind.dialect.name == "postgresql"
+    meeting_actions_type = postgresql.JSON(astext_type=sa.Text()) if is_pg else sa.JSON()
+    related_note_ids_type = postgresql.ARRAY(sa.Integer()) if is_pg else sa.JSON()
     op.add_column(
         "voice_notes",
         sa.Column("recording_type", sa.String(length=32), server_default="quick_note", nullable=False),
@@ -26,11 +30,11 @@ def upgrade() -> None:
     op.add_column("voice_notes", sa.Column("meeting_summary", sa.Text(), nullable=True))
     op.add_column(
         "voice_notes",
-        sa.Column("meeting_action_items", postgresql.JSON(astext_type=sa.Text()), nullable=True),
+        sa.Column("meeting_action_items", meeting_actions_type, nullable=True),
     )
     op.add_column(
         "voice_notes",
-        sa.Column("related_note_ids", postgresql.ARRAY(sa.Integer()), nullable=True),
+        sa.Column("related_note_ids", related_note_ids_type, nullable=True),
     )
     op.add_column("voice_notes", sa.Column("mood_score", sa.Float(), nullable=True))
     op.add_column("voice_notes", sa.Column("reflection_patterns", sa.Text(), nullable=True))

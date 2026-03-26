@@ -18,6 +18,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    created_default = sa.text("now()") if bind.dialect.name == "postgresql" else sa.text("CURRENT_TIMESTAMP")
     op.add_column(
         "users",
         sa.Column("timezone", sa.String(length=64), server_default="UTC", nullable=False),
@@ -31,7 +33,7 @@ def upgrade() -> None:
         sa.Column("end_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("is_focus", sa.Boolean(), nullable=True),
         sa.Column("source", sa.String(length=32), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=True),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=created_default, nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )

@@ -18,20 +18,25 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    is_sqlite = bind.dialect.name == "sqlite"
     op.add_column(
         "users",
         sa.Column("active_focus_block_id", sa.Integer(), nullable=True),
     )
-    op.create_foreign_key(
-        "fk_users_active_focus_block",
-        "users",
-        "focus_blocks",
-        ["active_focus_block_id"],
-        ["id"],
-        ondelete="SET NULL",
-    )
+    if not is_sqlite:
+        op.create_foreign_key(
+            "fk_users_active_focus_block",
+            "users",
+            "focus_blocks",
+            ["active_focus_block_id"],
+            ["id"],
+            ondelete="SET NULL",
+        )
 
 
 def downgrade() -> None:
-    op.drop_constraint("fk_users_active_focus_block", "users", type_="foreignkey")
+    bind = op.get_bind()
+    if bind.dialect.name != "sqlite":
+        op.drop_constraint("fk_users_active_focus_block", "users", type_="foreignkey")
     op.drop_column("users", "active_focus_block_id")

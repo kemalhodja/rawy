@@ -19,6 +19,11 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    is_pg = bind.dialect.name == "postgresql"
+    tags_type = postgresql.ARRAY(sa.String()) if is_pg else sa.JSON()
+    created_default = sa.text("now()") if is_pg else sa.text("CURRENT_TIMESTAMP")
+
     op.create_table(
         "users",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
@@ -26,7 +31,7 @@ def upgrade() -> None:
         sa.Column("hashed_password", sa.String(length=255), nullable=True),
         sa.Column("is_active", sa.Boolean(), nullable=True),
         sa.Column("plan", sa.String(length=20), nullable=True),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=True),
+        sa.Column("created_at", sa.DateTime(), server_default=created_default, nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("email"),
     )
@@ -43,10 +48,10 @@ def upgrade() -> None:
         sa.Column("transcript_confidence", sa.Float(), nullable=True),
         sa.Column("language", sa.String(length=10), nullable=True),
         sa.Column("title", sa.String(length=255), nullable=True),
-        sa.Column("tags", postgresql.ARRAY(sa.String()), nullable=True),
+        sa.Column("tags", tags_type, nullable=True),
         sa.Column("is_processed", sa.Boolean(), nullable=True),
         sa.Column("processing_error", sa.Text(), nullable=True),
-        sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=True),
+        sa.Column("created_at", sa.DateTime(), server_default=created_default, nullable=True),
         sa.Column("updated_at", sa.DateTime(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),

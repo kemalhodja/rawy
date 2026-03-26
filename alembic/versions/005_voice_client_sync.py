@@ -18,6 +18,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    is_pg = bind.dialect.name == "postgresql"
     op.add_column("voice_notes", sa.Column("client_id", sa.String(length=64), nullable=True))
     op.add_column(
         "voice_notes",
@@ -28,13 +30,21 @@ def upgrade() -> None:
         "voice_notes",
         sa.Column("quick_capture_exceeded", sa.Boolean(), nullable=False, server_default="false"),
     )
-    op.create_index(
-        "ix_voice_notes_user_client_id",
-        "voice_notes",
-        ["user_id", "client_id"],
-        unique=True,
-        postgresql_where=sa.text("client_id IS NOT NULL"),
-    )
+    if is_pg:
+        op.create_index(
+            "ix_voice_notes_user_client_id",
+            "voice_notes",
+            ["user_id", "client_id"],
+            unique=True,
+            postgresql_where=sa.text("client_id IS NOT NULL"),
+        )
+    else:
+        op.create_index(
+            "ix_voice_notes_user_client_id",
+            "voice_notes",
+            ["user_id", "client_id"],
+            unique=True,
+        )
 
 
 def downgrade() -> None:
