@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rawy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..600;1,14..32,400..600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f[]=geist-sans@400,500,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/app.css" />
+    <link rel="stylesheet" href="/static/css/voice-ui.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="brand">
+        <h1 class="font-geist">Rawy</h1>
+        <p>Voice-first knowledge — tek sütun, sade.</p>
+      </header>
+
+      <nav class="tabs" role="tablist" aria-label="Ana bölümler">
+        <button
+          type="button"
+          role="tab"
+          id="tab-ajanda"
+          aria-selected="true"
+          aria-controls="panel-ajanda"
+        >
+          Ajanda
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-sesler"
+          aria-selected="false"
+          aria-controls="panel-sesler"
+          tabindex="-1"
+        >
+          Sesler
+        </button>
+        <button
+          type="button"
+          role="tab"
+          id="tab-notlar"
+          aria-selected="false"
+          aria-controls="panel-notlar"
+          tabindex="-1"
+        >
+          Notlar
+        </button>
+      </nav>
+
+      <section
+        id="panel-ajanda"
+        role="tabpanel"
+        aria-labelledby="tab-ajanda"
+      >
+        <p class="panel-lead">Bugün ve yakın bloklar — API: <span class="voice-accent">/calendar</span></p>
+        <div class="panel-card">
+          <h2 class="font-geist">Şu anki blok</h2>
+          <p class="date-line tabular-nums">26 Mart 2026 · 14:00 — 16:00</p>
+          <p style="margin: 0.75rem 0 0; font-size: 0.875rem; color: rgba(255,255,255,0.65)">
+            Odak başlığı burada listelenir.
+          </p>
+        </div>
+      </section>
+
+      <section id="panel-sesler" role="tabpanel" aria-labelledby="tab-sesler" hidden>
+        <p class="panel-lead">
+          <span class="voice-accent">Ses</span> — basılı tutarak kayıt; transkript düzenlenebilir.
+          API: <span class="voice-accent">/voice/upload</span>
+        </p>
+
+        <div class="panel-card">
+          <h2 class="font-geist">Kayıt</h2>
+          <p id="voice-error" class="voice-error" hidden></p>
+          <div class="voice-capture">
+            <div class="voice-wave-stack is-idle" id="voice-wave-stack" aria-hidden="true">
+              <span class="voice-wave voice-wave--1"></span>
+              <span class="voice-wave voice-wave--2"></span>
+              <span class="voice-wave voice-wave--3"></span>
+            </div>
+            <button
+              type="button"
+              class="voice-record-btn"
+              id="voice-record-btn"
+              aria-label="Kayıt için basılı tutun"
+            >
+              <span class="voice-btn-inner" aria-hidden="true"></span>
+            </button>
+            <p class="voice-hint">Basılı tut — kayıt · Kırmızı buton yok, yumuşak turkuaz</p>
+            <p class="voice-status" id="voice-status" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <div class="panel-card">
+          <h2 class="font-geist">Oynat &amp; transkript</h2>
+          <div class="voice-inline-row">
+            <div class="voice-audio-col">
+              <p class="transcript-inline-label">Orijinal ses</p>
+              <p id="voice-audio-empty" class="voice-hint" style="margin: 0 0 0.5rem; text-align: left">
+                Kayıt bitince oynatıcı burada.
+              </p>
+              <audio id="voice-audio" controls preload="none" hidden></audio>
+            </div>
+            <div class="voice-transcript-col">
+              <div class="transcript-inline-label">Transkript (inline, düzenlenebilir)</div>
+              <div
+                class="voice-transcript font-mono"
+                id="voice-transcript"
+                contenteditable="true"
+                spellcheck="true"
+                data-placeholder="Kayıt sonrası metin burada; API transkripti veya elle düzenleme…"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="panel-notlar" role="tabpanel" aria-labelledby="tab-notlar" hidden>
+        <p class="panel-lead">Graf ve bağlantılar — API: <span class="voice-accent">/voice/graph</span></p>
+        <div class="panel-card">
+          <h2 class="font-geist">Notlar</h2>
+          <p style="margin: 0; font-size: 0.875rem; color: rgba(255,255,255,0.65)">
+            Liste ve önizleme burada; <span class="tabular-nums font-geist">720px</span> genişlikte hizalı.
+          </p>
+        </div>
+      </section>
+
+      <footer class="hint font-geist">
+        Koyu mod varsayılan · #0A0A0A / #FFFFFF / #14B8A6 · min 32px boşluk
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        var tabs = document.querySelectorAll('[role="tab"]');
+        var panels = document.querySelectorAll('[role="tabpanel"]');
+        var map = {
+          "tab-ajanda": "panel-ajanda",
+          "tab-sesler": "panel-sesler",
+          "tab-notlar": "panel-notlar",
+        };
+
+        function selectTab(tabId) {
+          tabs.forEach(function (t) {
+            var on = t.id === tabId;
+            t.setAttribute("aria-selected", on);
+            t.tabIndex = on ? 0 : -1;
+          });
+          var panelId = map[tabId];
+          panels.forEach(function (p) {
+            p.hidden = p.id !== panelId;
+          });
+        }
+
+        tabs.forEach(function (tab) {
+          tab.addEventListener("click", function () {
+            selectTab(tab.id);
+          });
+          tab.addEventListener("keydown", function (e) {
+            var i = Array.prototype.indexOf.call(tabs, tab);
+            if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+              e.preventDefault();
+              var next =
+                e.key === "ArrowRight"
+                  ? (i + 1) % tabs.length
+                  : (i - 1 + tabs.length) % tabs.length;
+              tabs[next].focus();
+              tabs[next].click();
+            }
+          });
+        });
+      })();
+    </script>
+    <script src="/static/js/voice-ui.js" defer></script>
+  </body>
+</html>

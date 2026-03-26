@@ -1,0 +1,177 @@
+/* Rawy — tek sütun, koyu mod, 720px max */
+
+:root {
+  --bg: #0a0a0a;
+  --text: #ffffff;
+  --accent: #14b8a6;
+  --accent-muted: rgba(20, 184, 166, 0.35);
+  --space: 32px;
+  --font-geist: "Geist Sans", "Geist", "Inter", system-ui, sans-serif;
+  --font-inter: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter);
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+.app-shell {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space) 1.25rem calc(var(--space) * 2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+}
+
+/* Geist: başlık, sekme, sayı/tarih */
+.font-geist {
+  font-family: var(--font-geist);
+  font-feature-settings: "ss01" 1, "cv01" 1;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Transkript alanı */
+.font-mono {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+
+header.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+header.brand h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+header.brand p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Nav */
+nav.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin: 0 calc(-1.25rem);
+  padding: 0 1.25rem;
+}
+
+nav.tabs button {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  margin-bottom: -1px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-geist);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+nav.tabs button:hover {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+nav.tabs button[aria-selected="true"] {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Paneller */
+[role="tabpanel"] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space);
+  min-height: 12rem;
+}
+
+[role="tabpanel"][hidden] {
+  display: none !important;
+}
+
+.panel-lead {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.panel-card {
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.panel-card h2 {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  font-family: var(--font-geist);
+}
+
+/* Ses vurgusu */
+.voice-accent {
+  color: var(--accent);
+}
+
+/* Tarih/saat örnekleri */
+.date-line {
+  font-family: var(--font-geist);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.transcript-placeholder {
+  margin: 0;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+footer.hint {
+  margin-top: auto;
+  padding-top: var(--space);
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+}

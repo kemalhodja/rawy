@@ -1,0 +1,15 @@
+# Not: faster-whisper==0.10.0, av==11.* ister; Windows+Py3.11 için PyPI'da av 11 wheel yok (kaynak derleme/MSVC gerekir).
+# Yerel transkript için 1.2.x kullanılıyor (av>=11, Windows wheel ile uyumlu).
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+python-multipart==0.0.6
+faster-whisper==1.2.1
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+pydantic-settings==2.1.0
+alembic==1.12.1
+pytest==7.4.3
+httpx==0.25.2
+email-validator>=2.0.0

@@ -1,0 +1,236 @@
+/* Ses UI: soft turkuaz daire, dalga, transkript + ses */
+
+.voice-capture {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem 0 0.5rem;
+}
+
+.voice-wave-stack {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  --voice-level: 0;
+}
+
+.voice-wave {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(20, 184, 166, 0.22);
+  background: transparent;
+  width: 72px;
+  height: 72px;
+  left: 50%;
+  top: 50%;
+  margin-left: -36px;
+  margin-top: -36px;
+  transform: scale(calc(1 + var(--voice-level, 0) * 0.55));
+  opacity: calc(0.25 + var(--voice-level, 0) * 0.55);
+  transition: transform 0.06s ease-out, opacity 0.12s ease;
+}
+
+.voice-wave--2 {
+  width: 92px;
+  height: 92px;
+  margin-left: -46px;
+  margin-top: -46px;
+  border-color: rgba(20, 184, 166, 0.16);
+  transform: scale(calc(1 + var(--voice-level, 0) * 0.4));
+  opacity: calc(0.15 + var(--voice-level, 0) * 0.35);
+  transition-delay: 0.02s;
+}
+
+.voice-wave--3 {
+  width: 118px;
+  height: 118px;
+  margin-left: -59px;
+  margin-top: -59px;
+  border-color: rgba(20, 184, 166, 0.1);
+  transform: scale(calc(1 + var(--voice-level, 0) * 0.28));
+  opacity: calc(0.08 + var(--voice-level, 0) * 0.22);
+  transition-delay: 0.04s;
+}
+
+.voice-wave-stack.is-idle .voice-wave {
+  animation: voice-idle-pulse 2.8s ease-in-out infinite;
+  opacity: 0.18;
+}
+
+.voice-wave-stack.is-idle .voice-wave--2 {
+  animation-delay: 0.2s;
+}
+
+.voice-wave-stack.is-idle .voice-wave--3 {
+  animation-delay: 0.4s;
+}
+
+@keyframes voice-idle-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.12;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.22;
+  }
+}
+
+.voice-record-btn {
+  position: relative;
+  z-index: 2;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 1px solid rgba(20, 184, 166, 0.38);
+  background: radial-gradient(
+    circle at 32% 28%,
+    rgba(20, 184, 166, 0.42),
+    rgba(20, 184, 166, 0.14) 52%,
+    rgba(20, 184, 166, 0.06)
+  );
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 8px 28px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.voice-record-btn:hover {
+  border-color: rgba(20, 184, 166, 0.55);
+  background: radial-gradient(
+    circle at 32% 28%,
+    rgba(20, 184, 166, 0.5),
+    rgba(20, 184, 166, 0.18) 52%,
+    rgba(20, 184, 166, 0.08)
+  );
+}
+
+.voice-record-btn:active,
+.voice-record-btn.is-recording {
+  transform: scale(0.94);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 4px 16px rgba(20, 184, 166, 0.15);
+}
+
+.voice-record-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.voice-record-btn .voice-btn-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.voice-hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+  max-width: 16rem;
+}
+
+.voice-status {
+  min-height: 1.25rem;
+  font-size: 0.75rem;
+  font-family: var(--font-geist);
+  color: var(--accent);
+  opacity: 0.9;
+}
+
+/* Satır: ses oynatıcı | transkript */
+.voice-inline-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 520px) {
+  .voice-inline-row {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+}
+
+.voice-audio-col {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.voice-audio-col audio {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  height: 36px;
+  filter: saturate(0.9) opacity(0.95);
+}
+
+.voice-audio-col audio::-webkit-media-controls-panel {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.voice-transcript-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.transcript-inline-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-geist);
+}
+
+.voice-transcript {
+  min-height: 6rem;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.28);
+  color: rgba(255, 255, 255, 0.92);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.voice-transcript:focus {
+  border-color: rgba(20, 184, 166, 0.45);
+}
+
+.voice-transcript:empty::before {
+  content: attr(data-placeholder);
+  color: rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+}
+
+.voice-error {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #f87171;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-wave-stack.is-idle .voice-wave {
+    animation: none;
+  }
+}
