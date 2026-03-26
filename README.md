@@ -67,9 +67,19 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 python -m pytest tests/ -q
 ```
 
+## PostgreSQL Smoke
+
+```bash
+# 1) PostgreSQL acik olmali (docker compose up -d db)
+# 2) DATABASE_URL PostgreSQL'e isaret etmeli
+DATABASE_URL=postgresql://rawy:rawy@localhost:5432/rawy python scripts/smoke_pg.py
+```
+
 ## Notes
 
 - `uploads/` contains user audio files and is ignored by git except `.gitkeep`.
+- Upload size limiti `MAX_UPLOAD_SIZE` ile zorlanir (`app/services/storage.py`).
+- Multipart upload icin `python-multipart` dependency zorunludur.
 - SQLite is supported for local smoke tests via:
 
 ```bash
