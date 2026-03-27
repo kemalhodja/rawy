@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import SessionLocal, get_db
 from app.deps import get_current_user
-from app.models import FocusBlock, Task, User, VoiceNote
+from app.models import FocusBlock, Reminder, Task, User, VoiceNote
 from app.services.note_graph_insights import (
     extract_wikilinks,
     find_notes_by_anchor_title,
@@ -630,3 +630,121 @@ def process_transcription(note_id: int) -> None:
             run_post_processing(pipe, note_id)
         finally:
             pipe.close()
+
+
+@router.post("/process-text")
+def process_text_command(
+    text: str,
+    timezone: str = "UTC",
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Doğrudan metin komutunu işle (Web Speech API için).
+    Hatırlatıcı, görev, not oluşturur.
+    """
+    from app.services.intent_pipeline import classify_transcript
+    from app.services.voice_deadline import parse_deadline_from_voice
+    
+    text_lower = text.lower()
+    category = classify_transcript(text)
+    
+    # Zaman ayrıştır
+    remind_at = parse_deadline_from_voice(text, timezone)
+    
+    if category == "reminder":
+        # Hatırlatıcı oluştur
+        recurrence = None
+        recurrence_keywords = {
+            "her gün": "daily", "hergun": "daily",
+            "her hafta": "weekly", "herhafta": "weekly",
+            "her ay": "monthly", "heray": "monthly",
+        }
+        for keyword, rec_type in recurrence_keywords.items():
+            if keyword in text_lower:
+                recurrence = rec_type
+                break
+        
+        # Başlık temizleme
+        title = text
+        clean_words = ["hatırlat", "hatırlatıcı", "alarm", "kur", "bana", "beni", "uyar", "remind"]
+        for word in clean_words:
+            title = title.replace(word, "").replace(word.capitalize(), "")
+        title = " ".join(title.split()).strip()
+        if not title:
+            title = "Hatırlatıcı"
+        
+        reminder = Reminder(
+            user_id=current_user.id,
+            title=title[:255],
+            note=text[:2000],
+            remind_at=remind_at,
+            timezone=timezone,
+            recurrence=recurrence,
+            notify_methods=["push", "voice"],
+        )
+        db.add(reminder)
+        db.commit()
+        db.refresh(reminder)
+        
+        return {
+            "type": "reminder",
+            "id": reminder.id,
+            "title": reminder.title,
+            "remind_at": remind_at.isoformat() if remind_at else None,
+            "message": f"'{reminder.title}' hatırlatıcısı kuruldu"
+        }
+    
+    elif category == "task":
+        # Görev oluştur
+        title = text
+        clean_words = ["görev", "task", "yapılacak", "ekle", "oluştur"]
+        for word in clean_words:
+            title = title.replace(word, "").replace(word.capitalize(), "")
+        title = " ".join(title.split()).strip()
+        if not title:
+            title = "Görev"
+        
+        task = Task(
+            user_id=current_user.id,
+            title=title[:500],
+            due_at=remind_at,
+            depth="shallow",
+        )
+        db.add(task)
+        db.commit()
+        db.refresh(task)
+        
+        return {
+            "type": "task",
+            "id": task.id,
+            "title": task.title,
+            "due_at": remind_at.isoformat() if remind_at else None,
+            "message": f"'{task.title}' görevi eklendi"
+        }
+    
+    else:
+        # Normal not olarak kaydet
+        voice_note = VoiceNote(
+            user_id=current_user.id,
+            transcript=text,
+            title=text[:100],
+            is_processed=True,
+            language="tr",
+            mime_type="text/plain",
+            storage_path="text://" + text[:50],
+        )
+        db.add(voice_note)
+        db.commit()
+        db.refresh(voice_note)
+        
+        # Pipeline çalıştır
+        from app.services.intent_pipeline import run_intent_pipeline
+        run_intent_pipeline(db, voice_note.id)
+        
+        return {
+            "type": "note",
+            "id": voice_note.id,
+            "title": voice_note.title,
+            "message": "Not kaydedildi"
+        }
