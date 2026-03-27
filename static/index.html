@@ -73,203 +73,64 @@
     .logout { position: absolute; top: 0; right: 0; padding: 0.5rem 0.875rem; background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: var(--muted); font-size: 0.8125rem; cursor: pointer; }
     .logout:hover { color: var(--danger); border-color: var(--danger); }
     
-    /* ========== BAS-KONUŞ WIDGET ========== */
-    .voice-widget {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: var(--widget-size);
-      height: var(--widget-size);
-      border-radius: 50%;
-      background: var(--accent);
-      border: none;
-      cursor: pointer;
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 20px rgba(20,184,166,0.4), 0 0 0 4px rgba(20,184,166,0.1);
-      transition: all 0.3s ease;
-    }
-    .voice-widget:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 30px rgba(20,184,166,0.5), 0 0 0 6px rgba(20,184,166,0.15);
-    }
-    .voice-widget:active {
-      transform: scale(0.95);
-    }
-    .voice-widget.recording {
-      background: var(--danger);
-      box-shadow: 0 4px 20px rgba(239,68,68,0.4), 0 0 0 4px rgba(239,68,68,0.1);
-      animation: pulse-widget 1.2s infinite;
-    }
-    @keyframes pulse-widget {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    .voice-widget svg {
-      width: 32px;
-      height: 32px;
-      fill: #000;
-    }
-    .voice-widget.recording svg {
-      fill: #fff;
-    }
+    /* ========== VOICE AUTH LOGIN ========== */
+    .voice-auth-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; }
+    .voice-auth-btn { width: 100%; padding: 1rem; background: rgba(20,184,166,0.1); border: 2px dashed var(--accent); border-radius: 12px; color: var(--accent); font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .voice-auth-btn:hover { background: rgba(20,184,166,0.2); }
+    .voice-auth-btn.recording { background: var(--danger); border-color: var(--danger); color: #fff; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.7} }
     
-    /* Widget Menü */
-    .widget-menu {
-      position: fixed;
-      bottom: 100px;
-      right: 20px;
-      background: rgba(30,30,30,0.95);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 0.5rem;
-      z-index: 998;
-      display: none;
-      flex-direction: column;
-      gap: 0.5rem;
-      backdrop-filter: blur(10px);
-      min-width: 180px;
-    }
+    /* ========== SPEAKER PROFILE ========== */
+    .speaker-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    .speaker-card h4 { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .speaker-card .confidence-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 0.5rem; overflow: hidden; }
+    .speaker-card .confidence-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.3s; }
+    .speaker-card .delete-btn { float: right; background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 0.875rem; }
+    
+    /* ========== DIARIZATION ========== */
+    .diarization-segment { display: flex; gap: 1rem; padding: 0.75rem; border-left: 3px solid var(--accent); margin-bottom: 0.5rem; background: rgba(255,255,255,0.03); border-radius: 0 8px 8px 0; }
+    .diarization-time { color: var(--muted); font-size: 0.75rem; min-width: 50px; }
+    .diarization-speaker { font-weight: 600; color: var(--accent); min-width: 80px; }
+    .diarization-text { flex: 1; color: var(--fg); }
+    
+    /* ========== WIDGET ========== */
+    .voice-widget { position: fixed; bottom: 20px; right: 20px; width: var(--widget-size); height: var(--widget-size); border-radius: 50%; background: var(--accent); border: none; cursor: pointer; z-index: 999; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(20,184,166,0.4), 0 0 0 4px rgba(20,184,166,0.1); transition: all 0.3s ease; }
+    .voice-widget:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(20,184,166,0.5), 0 0 0 6px rgba(20,184,166,0.15); }
+    .voice-widget:active { transform: scale(0.95); }
+    .voice-widget.recording { background: var(--danger); box-shadow: 0 4px 20px rgba(239,68,68,0.4), 0 0 0 4px rgba(239,68,68,0.1); animation: pulse-widget 1.2s infinite; }
+    @keyframes pulse-widget { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    .voice-widget svg { width: 32px; height: 32px; fill: #000; }
+    .voice-widget.recording svg { fill: #fff; }
+    .widget-menu { position: fixed; bottom: 100px; right: 20px; background: rgba(30,30,30,0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 0.5rem; z-index: 998; display: none; flex-direction: column; gap: 0.5rem; backdrop-filter: blur(10px); min-width: 180px; }
     .widget-menu.active { display: flex; animation: slideUp 0.2s ease; }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .widget-menu-item {
-      padding: 0.75rem 1rem;
-      background: transparent;
-      border: none;
-      color: var(--fg);
-      text-align: left;
-      cursor: pointer;
-      border-radius: 10px;
-      font-size: 0.9375rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      transition: all 0.2s;
-    }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .widget-menu-item { padding: 0.75rem 1rem; background: transparent; border: none; color: var(--fg); text-align: left; cursor: pointer; border-radius: 10px; font-size: 0.9375rem; display: flex; align-items: center; gap: 0.75rem; transition: all 0.2s; }
     .widget-menu-item:hover { background: rgba(255,255,255,0.08); }
     .widget-menu-item .icon { font-size: 1.25rem; }
-    
-    /* Ses Tanıma Modal */
-    .voice-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.9);
-      z-index: 1001;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      padding: 2rem;
-    }
+    .voice-modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 1001; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 2rem; }
     .voice-modal.active { display: flex; }
-    .voice-wave {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 4rem;
-      margin-bottom: 2rem;
-      animation: voice-pulse 1s infinite;
-    }
-    @keyframes voice-pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.8; }
-    }
-    .voice-modal.recording .voice-wave {
-      background: var(--danger);
-      animation: voice-recording 0.5s infinite alternate;
-    }
-    @keyframes voice-recording {
-      from { transform: scale(1); }
-      to { transform: scale(1.15); }
-    }
-    .voice-text {
-      font-size: 1.25rem;
-      text-align: center;
-      color: var(--muted);
-      max-width: 400px;
-      min-height: 60px;
-    }
-    .voice-hint {
-      margin-top: 1rem;
-      font-size: 0.875rem;
-      color: var(--muted);
-    }
-    .voice-close {
-      position: absolute;
-      top: 2rem;
-      right: 2rem;
-      background: rgba(255,255,255,0.1);
-      border: none;
-      color: var(--fg);
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    
-    /* Komut Sonuçları */
-    .command-result {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(30,30,30,0.98);
-      border: 1px solid rgba(20,184,166,0.3);
-      border-radius: 20px;
-      padding: 2rem;
-      z-index: 1002;
-      display: none;
-      min-width: 300px;
-      max-width: 90vw;
-      text-align: center;
-    }
+    .voice-wave { width: 200px; height: 200px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 2rem; animation: voice-pulse 1s infinite; }
+    @keyframes voice-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } }
+    .voice-modal.recording .voice-wave { background: var(--danger); animation: voice-recording 0.5s infinite alternate; }
+    @keyframes voice-recording { from { transform: scale(1); } to { transform: scale(1.15); } }
+    .voice-text { font-size: 1.25rem; text-align: center; color: var(--muted); max-width: 400px; min-height: 60px; }
+    .voice-hint { margin-top: 1rem; font-size: 0.875rem; color: var(--muted); }
+    .voice-close { position: absolute; top: 2rem; right: 2rem; background: rgba(255,255,255,0.1); border: none; color: var(--fg); width: 48px; height: 48px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; }
+    .command-result { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(30,30,30,0.98); border: 1px solid rgba(20,184,166,0.3); border-radius: 20px; padding: 2rem; z-index: 1002; display: none; min-width: 300px; max-width: 90vw; text-align: center; }
     .command-result.active { display: block; animation: popIn 0.3s ease; }
-    @keyframes popIn {
-      from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
-      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-    }
+    @keyframes popIn { from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
     .command-result h3 { color: var(--accent); margin-bottom: 1rem; }
     .command-result p { color: var(--muted); margin-bottom: 1.5rem; }
     .command-result .actions { display: flex; gap: 0.75rem; justify-content: center; }
-    
-    /* PWA Install Banner */
-    .install-banner {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: rgba(20,184,166,0.95);
-      color: #000;
-      padding: 1rem;
-      z-index: 1003;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-    }
+    .install-banner { position: fixed; top: 0; left: 0; right: 0; background: rgba(20,184,166,0.95); color: #000; padding: 1rem; z-index: 1003; display: none; align-items: center; justify-content: space-between; gap: 1rem; }
     .install-banner.active { display: flex; }
-    .install-banner button {
-      background: #000;
-      color: var(--accent);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .install-banner button { background: #000; color: var(--accent); border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    
+    /* Enroll modal */
+    .enroll-steps { text-align: left; margin: 1rem 0; }
+    .enroll-steps li { margin-bottom: 0.5rem; color: var(--muted); }
+    .record-progress { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 1rem; overflow: hidden; }
+    .record-progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.1s linear; }
   </style>
 </head>
 <body>
@@ -282,36 +143,29 @@
     </div>
   </div>
 
-  <!-- Voice Widget (Bas-Konuş) -->
+  <!-- Voice Widget -->
   <button id="voice-widget" class="voice-widget" onclick="toggleWidgetMenu()">
     <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/></svg>
   </button>
   
-  <!-- Widget Menü -->
+  <!-- Widget Menu -->
   <div id="widget-menu" class="widget-menu">
-    <button class="widget-menu-item" onclick="startVoiceCommand('note')">
-      <span class="icon">📝</span> Hızlı Not
-    </button>
-    <button class="widget-menu-item" onclick="startVoiceCommand('reminder')">
-      <span class="icon">⏰</span> Hatırlatıcı
-    </button>
-    <button class="widget-menu-item" onclick="startVoiceCommand('task')">
-      <span class="icon">✅</span> Görev Ekle
-    </button>
-    <button class="widget-menu-item" onclick="startVoiceCommand('command')">
-      <span class="icon">🎙️</span> Sesli Komut
-    </button>
+    <button class="widget-menu-item" onclick="startVoiceCommand('note')"><span class="icon">📝</span> Hızlı Not</button>
+    <button class="widget-menu-item" onclick="startVoiceCommand('reminder')"><span class="icon">⏰</span> Hatırlatıcı</button>
+    <button class="widget-menu-item" onclick="startVoiceCommand('task')"><span class="icon">✅</span> Görev Ekle</button>
+    <button class="widget-menu-item" onclick="startVoiceCommand('command')"><span class="icon">🎙️</span> Sesli Komut</button>
   </div>
   
-  <!-- Ses Tanıma Modal -->
+  <!-- Voice Modal -->
   <div id="voice-modal" class="voice-modal">
     <button class="voice-close" onclick="stopVoiceRecognition()">✕</button>
     <div class="voice-wave" id="voice-wave">🎙️</div>
     <div class="voice-text" id="voice-text">Dinleniyor...</div>
-    <div class="voice-hint">"Yarın saat 9'da toplantım var" veya "Su içmeyi unutma"</div>
+    <div class="voice-hint" id="voice-hint">"Yarın saat 9'da toplantım var" veya "Su içmeyi unutma"</div>
+    <div class="record-progress" id="record-progress"><div class="record-progress-fill" id="progress-fill"></div></div>
   </div>
   
-  <!-- Komut Sonuç Modal -->
+  <!-- Command Result Modal -->
   <div id="command-result" class="command-result">
     <h3 id="result-title">✅ Tamamlandı</h3>
     <p id="result-text">Not kaydedildi</p>
@@ -324,79 +178,154 @@
   <div id="loading" class="loading-overlay"><div class="spinner"></div></div>
   
   <div class="container">
+    <!-- AUTH VIEW -->
     <div id="auth-view" class="hidden">
       <div class="brand"><h1>Rawy</h1><p>Sesli asistanın</p></div>
       <div class="tabs">
         <button class="tab active" onclick="showTab('login')">Giriş</button>
         <button class="tab" onclick="showTab('register')">Kayıt</button>
+        <button class="tab" onclick="showTab('voiceauth')">🔊 Sesle Giriş</button>
       </div>
+      
       <form id="login-form" onsubmit="return doLogin(event)">
         <input type="email" id="login-email" placeholder="Email" required>
         <input type="password" id="login-pass" placeholder="Şifre" required>
         <button type="submit" id="login-btn">Giriş Yap</button>
         <div id="login-error" class="error hidden"></div>
       </form>
+      
       <form id="register-form" class="hidden" onsubmit="return doRegister(event)">
         <input type="email" id="reg-email" placeholder="Email" required>
         <input type="password" id="reg-pass" placeholder="Şifre (min 6)" minlength="6" required>
         <button type="submit" id="reg-btn">Kayıt Ol</button>
         <div id="reg-error" class="error hidden"></div>
       </form>
+      
+      <!-- Voice Auth Login -->
+      <div id="voice-auth-section" class="hidden">
+        <p style="color:var(--muted);margin-bottom:1rem;text-align:center">Ses şifrenizle giriş yapın</p>
+        <button id="voice-login-btn" class="voice-auth-btn" onmousedown="startVoiceAuth()" onmouseup="stopVoiceAuth()" ontouchstart="startVoiceAuth()" ontouchend="stopVoiceAuth()">
+          🔊 Basılı Tut ve Konuş
+        </button>
+        <div id="voice-auth-status" style="text-align:center;margin-top:1rem;color:var(--muted)"></div>
+      </div>
     </div>
     
+    <!-- APP VIEW -->
     <div id="app-view" class="hidden">
       <button class="logout" onclick="doLogout()">Çıkış</button>
       <div class="brand"><h1>Rawy</h1><p id="user-info">-</p></div>
+      
       <div class="nav">
         <button class="nav-btn active" onclick="showPanel('calendar')">Ajanda</button>
         <button class="nav-btn" onclick="showPanel('voice')">Sesler</button>
         <button class="nav-btn" onclick="showPanel('reminders')">Hatırlatıcılar</button>
         <button class="nav-btn" onclick="showPanel('tasks')">Görevler</button>
-        <button class="nav-btn" onclick="showPanel('graph')">Graph</button>
+        <button class="nav-btn" onclick="showPanel('speaker')">🔊 Sesim</button>
       </div>
       
+      <!-- Calendar Panel -->
       <div id="calendar-panel" class="panel active">
-        <div class="panel-header"><h2>Ajanda</h2><button class="modal-btn secondary" onclick="refreshData()">Yenile</button></div>
+        <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h2>Ajanda</h2>
+          <button class="modal-btn secondary" onclick="refreshData()">Yenile</button>
+        </div>
         <div id="calendar-list"><div class="empty"><p>Yükleniyor...</p></div></div>
       </div>
       
+      <!-- Voice Panel -->
       <div id="voice-panel" class="panel">
-        <div class="recorder-container">
-          <button class="record-btn" id="rec-btn" onmousedown="startRec()" onmouseup="stopRec()" ontouchstart="startRec()" ontouchend="stopRec()">
-            <div class="record-inner">🎙️</div>
+        <div style="text-align:center;padding:2rem;">
+          <button class="voice-widget" style="position:static;margin-bottom:1rem;" onmousedown="startRec()" onmouseup="stopRec()" ontouchstart="startRec()" ontouchend="stopRec()">
+            <svg viewBox="0 0 24 24" style="width:32px;height:32px;fill:#000;"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/></svg>
           </button>
-          <p class="rec-hint">Basılı tut, konuş, bırak</p>
-          <div id="status"></div>
+          <p style="color:var(--muted);">Basılı tut, konuş, bırak</p>
+          <div id="status" style="margin-top:1rem;color:var(--accent);"></div>
         </div>
         <div id="voice-list"></div>
       </div>
       
+      <!-- Reminders Panel -->
       <div id="reminders-panel" class="panel">
-        <div class="panel-header"><h2>Hatırlatıcılar</h2><button class="modal-btn primary" onclick="startVoiceCommand('reminder')">+ Yeni</button></div>
+        <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h2>Hatırlatıcılar</h2>
+          <button class="modal-btn primary" onclick="startVoiceCommand('reminder')">+ Yeni</button>
+        </div>
         <div id="reminders-list"><div class="empty"><p>Yükleniyor...</p></div></div>
       </div>
       
+      <!-- Tasks Panel -->
       <div id="tasks-panel" class="panel">
-        <div class="panel-header"><h2>Görevler</h2><button class="modal-btn primary" onclick="startVoiceCommand('task')">+ Yeni</button></div>
+        <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+          <h2>Görevler</h2>
+          <button class="modal-btn primary" onclick="startVoiceCommand('task')">+ Yeni</button>
+        </div>
         <div id="tasks-list"><div class="empty"><p>Yükleniyor...</p></div></div>
       </div>
       
-      <div id="graph-panel" class="panel">
-        <div class="panel-header"><h2>Knowledge Graph</h2></div>
-        <div class="graph-container" id="graph-viz"><div class="graph-placeholder">Yükleniyor...</div></div>
+      <!-- Speaker Recognition Panel -->
+      <div id="speaker-panel" class="panel">
+        <div class="panel-header" style="margin-bottom:1rem;">
+          <h2>🔊 Ses Tanıma Profilim</h2>
+        </div>
+        
+        <!-- Enrollment Section -->
+        <div id="speaker-enroll-section">
+          <p style="color:var(--muted);margin-bottom:1rem;">Ses şifrenizi oluşturun. Bu sayede sesle giriş yapabilir ve toplantılarda sizin konuşmalarınızı ayırt edebiliriz.</p>
+          
+          <div class="enroll-steps">
+            <ol>
+              <li>Aşağıdaki butona basın</li>
+              <li>"Merhaba benim, bu benim ses şifrem" deyin</li>
+              <li>En az 5 saniye konuşun</li>
+              <li>Kaydet butonuna basın</li>
+            </ol>
+          </div>
+          
+          <button id="enroll-btn" class="voice-auth-btn" onclick="startEnrollment()">
+            🎙️ Ses Kaydı Oluştur
+          </button>
+          <div id="enroll-status" style="text-align:center;margin-top:1rem;"></div>
+        </div>
+        
+        <!-- Existing Profiles -->
+        <div id="speaker-profiles" style="margin-top:2rem;">
+          <h3 style="margin-bottom:1rem;">Kayıtlı Seslerim</h3>
+          <div id="speaker-list"><p style="color:var(--muted);">Henüz ses kaydınız yok</p></div>
+        </div>
+        
+        <!-- Test Verification -->
+        <div id="speaker-test" style="margin-top:2rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.1);">
+          <h3 style="margin-bottom:1rem;">🧪 Sesimi Test Et</h3>
+          <p style="color:var(--muted);margin-bottom:1rem;">Ses şifrenizin çalışıp çalışmadığını test edin</p>
+          <button class="voice-auth-btn" onclick="startVerificationTest()">
+            🔊 Test Et
+          </button>
+          <div id="verify-result" style="margin-top:1rem;"></div>
+        </div>
+        
+        <!-- Diarization History -->
+        <div id="diarization-history" style="margin-top:2rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,0.1);">
+          <h3 style="margin-bottom:1rem;">Toplantı Geçmişim</h3>
+          <div id="meeting-list"><p style="color:var(--muted);">İşlenmiş toplantı yok</p></div>
+        </div>
       </div>
     </div>
   </div>
   
   <div id="toast" class="toast"></div>
-  
+
   <script>
     // ========== GLOBALS ==========
     const API = window.location.origin;
     let token = localStorage.getItem('token');
+    let currentWorkspace = localStorage.getItem('currentWorkspace');
+    let recorder = null, chunks = [];
     let recognition = null;
     let isRecording = false;
     let deferredPrompt = null;
+    let voiceAuthRecorder = null;
+    let enrollRecorder = null;
     
     // ========== INIT ==========
     window.onload = () => {
@@ -405,21 +334,18 @@
         if (token) showApp(); else showAuth();
       }, 500);
       
-      // PWA install event
       window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         document.getElementById('install-banner').classList.add('active');
       });
       
-      // Service Worker kaydet
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/static/service-worker.js')
           .then(() => console.log('SW registered'))
           .catch(console.error);
       }
       
-      // Speech API kontrol
       if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         setupSpeechRecognition();
       }
@@ -443,8 +369,7 @@
     
     // ========== WIDGET ==========
     function toggleWidgetMenu() {
-      const menu = document.getElementById('widget-menu');
-      menu.classList.toggle('active');
+      document.getElementById('widget-menu').classList.toggle('active');
     }
     
     function startVoiceCommand(type) {
@@ -458,7 +383,7 @@
         'task': '"Salı günü raporu bitir"',
         'command': 'Komutunuzu söyleyin...'
       };
-      document.querySelector('.voice-hint').textContent = hints[type] || 'Konuşmaya başlayın...';
+      document.getElementById('voice-hint').textContent = hints[type] || 'Konuşmaya başlayın...';
       
       startSpeechRecognition();
     }
@@ -501,7 +426,6 @@
       try {
         recognition.start();
       } catch(e) {
-        // Zaten başlamışsa durdur yeniden başlat
         recognition.stop();
         setTimeout(() => recognition.start(), 100);
       }
@@ -516,6 +440,273 @@
       isRecording = false;
     }
     
+    // ========== VOICE AUTH LOGIN ==========
+    async function startVoiceAuth() {
+      const btn = document.getElementById('voice-login-btn');
+      const status = document.getElementById('voice-auth-status');
+      
+      btn.classList.add('recording');
+      status.textContent = 'Dinleniyor...';
+      
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+        voiceAuthRecorder = new MediaRecorder(stream);
+        let audioChunks = [];
+        
+        voiceAuthRecorder.ondataavailable = e => audioChunks.push(e.data);
+        voiceAuthRecorder.onstop = async () => {
+          const blob = new Blob(audioChunks, {type: 'audio/webm'});
+          status.textContent = 'Doğrulanıyor...';
+          
+          // Sesle giriş API çağrısı
+          const formData = new FormData();
+          formData.append('file', blob, 'voice_auth.webm');
+          
+          try {
+            const res = await fetch(API + '/speaker/auth', {
+              method: 'POST',
+              body: formData
+            });
+            const data = await res.json();
+            
+            if (data.authenticated) {
+              token = data.access_token;
+              localStorage.setItem('token', token);
+              showToast('Sesle giriş başarılı!');
+              showApp();
+            } else {
+              status.innerHTML = `<span style="color:var(--danger)">❌ ${data.message}</span>`;
+            }
+          } catch (err) {
+            status.innerHTML = '<span style="color:var(--danger)">Hata oluştu</span>';
+          }
+          
+          btn.classList.remove('recording');
+        };
+        
+        voiceAuthRecorder.start();
+        
+        // 5 saniye sonra otomatik durdur
+        setTimeout(() => {
+          if (voiceAuthRecorder && voiceAuthRecorder.state === 'recording') {
+            stopVoiceAuth();
+          }
+        }, 5000);
+        
+      } catch (err) {
+        showToast('Mikrofon erişimi yok', 'error');
+        btn.classList.remove('recording');
+      }
+    }
+    
+    function stopVoiceAuth() {
+      const btn = document.getElementById('voice-login-btn');
+      if (voiceAuthRecorder && voiceAuthRecorder.state === 'recording') {
+        voiceAuthRecorder.stop();
+        voiceAuthRecorder.stream.getTracks().forEach(t => t.stop());
+      }
+      btn.classList.remove('recording');
+    }
+    
+    // ========== ENROLLMENT ==========
+    async function startEnrollment() {
+      const btn = document.getElementById('enroll-btn');
+      const status = document.getElementById('enroll-status');
+      
+      btn.textContent = '🔴 Kaydediyor... (5 saniye)';
+      btn.classList.add('recording');
+      status.innerHTML = '<p style="color:var(--accent)">"Merhaba benim, bu benim ses şifrem" deyin...</p>';
+      
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+        enrollRecorder = new MediaRecorder(stream);
+        let audioChunks = [];
+        let progress = 0;
+        
+        // Progress bar
+        const progressInterval = setInterval(() => {
+          progress += 2;
+          document.getElementById('progress-fill').style.width = progress + '%';
+        }, 100);
+        
+        enrollRecorder.ondataavailable = e => audioChunks.push(e.data);
+        enrollRecorder.onstop = async () => {
+          clearInterval(progressInterval);
+          document.getElementById('progress-fill').style.width = '0%';
+          
+          const blob = new Blob(audioChunks, {type: 'audio/webm'});
+          status.textContent = 'İşleniyor...';
+          
+          const formData = new FormData();
+          formData.append('file', blob, 'enrollment.webm');
+          
+          try {
+            const res = await fetch(API + '/speaker/enroll', {
+              method: 'POST',
+              headers: {'Authorization': 'Bearer ' + token},
+              body: formData
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+              status.innerHTML = `<span style="color:var(--accent)">✅ ${data.message}</span>`;
+              loadSpeakerProfiles();
+            } else {
+              status.innerHTML = `<span style="color:var(--danger)">❌ ${data.message}</span>`;
+            }
+          } catch (err) {
+            status.innerHTML = '<span style="color:var(--danger)">Hata oluştu</span>';
+          }
+          
+          btn.textContent = '🎙️ Ses Kaydı Oluştur';
+          btn.classList.remove('recording');
+        };
+        
+        enrollRecorder.start();
+        
+        // 5 saniye sonra otomatik durdur
+        setTimeout(() => {
+          if (enrollRecorder && enrollRecorder.state === 'recording') {
+            enrollRecorder.stop();
+            enrollRecorder.stream.getTracks().forEach(t => t.stop());
+          }
+        }, 5000);
+        
+      } catch (err) {
+        showToast('Mikrofon erişimi yok', 'error');
+        btn.textContent = '🎙️ Ses Kaydı Oluştur';
+        btn.classList.remove('recording');
+      }
+    }
+    
+    // ========== SPEAKER PROFILES ==========
+    async function loadSpeakerProfiles() {
+      try {
+        const res = await fetch(API + '/speaker/profile', {
+          headers: {'Authorization': 'Bearer ' + token}
+        });
+        const profiles = await res.json();
+        
+        const list = document.getElementById('speaker-list');
+        if (!profiles.length) {
+          list.innerHTML = '<p style="color:var(--muted);">Henüz ses kaydınız yok</p>';
+          return;
+        }
+        
+        list.innerHTML = profiles.map(p => `
+          <div class="speaker-card">
+            <button class="delete-btn" onclick="deleteSpeakerProfile(${p.id})">🗑️ Sil</button>
+            <h4>🎙️ Ses Kaydı #${p.id}</h4>
+            <p style="color:var(--muted);font-size:0.875rem;">
+              Model: ${p.model} | 
+              ${p.sample_duration ? p.sample_duration.toFixed(1) + ' saniye' : 'Süre bilinmiyor'}
+            </p>
+            <p style="color:var(--muted);font-size:0.75rem;margin-top:0.5rem;">
+              ${new Date(p.created_at).toLocaleString('tr-TR')}
+            </p>
+            ${p.confidence_score ? `
+              <div style="margin-top:0.5rem;">
+                <span style="font-size:0.75rem;color:var(--muted);">Kalite: ${(p.confidence_score * 100).toFixed(0)}%</span>
+                <div class="confidence-bar">
+                  <div class="confidence-fill" style="width:${p.confidence_score * 100}%"></div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `).join('');
+        
+      } catch (e) {
+        console.error('Speaker profiles load error:', e);
+      }
+    }
+    
+    async function deleteSpeakerProfile(id) {
+      if (!confirm('Bu ses kaydını silmek istediğinize emin misiniz?')) return;
+      
+      try {
+        await fetch(API + '/speaker/profile/' + id, {
+          method: 'DELETE',
+          headers: {'Authorization': 'Bearer ' + token}
+        });
+        showToast('Ses kaydı silindi');
+        loadSpeakerProfiles();
+      } catch (e) {
+        showToast('Silme başarısız', 'error');
+      }
+    }
+    
+    // ========== VERIFICATION TEST ==========
+    async function startVerificationTest() {
+      const btn = event.target;
+      const resultDiv = document.getElementById('verify-result');
+      
+      btn.classList.add('recording');
+      btn.textContent = '🔴 Dinleniyor...';
+      resultDiv.innerHTML = '<p style="color:var(--muted);">Sesiniz analiz ediliyor...</p>';
+      
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+        const testRecorder = new MediaRecorder(stream);
+        let audioChunks = [];
+        
+        testRecorder.ondataavailable = e => audioChunks.push(e.data);
+        testRecorder.onstop = async () => {
+          const blob = new Blob(audioChunks, {type: 'audio/webm'});
+          
+          const formData = new FormData();
+          formData.append('file', blob, 'test.webm');
+          
+          try {
+            const res = await fetch(API + '/speaker/verify', {
+              method: 'POST',
+              headers: {'Authorization': 'Bearer ' + token},
+              body: formData
+            });
+            const data = await res.json();
+            
+            if (data.is_match) {
+              resultDiv.innerHTML = `
+                <div style="background:rgba(20,184,166,0.1);border:1px solid var(--accent);border-radius:8px;padding:1rem;">
+                  <p style="color:var(--accent);font-weight:600;">✅ ${data.message}</p>
+                  <p style="color:var(--muted);font-size:0.875rem;margin-top:0.5rem;">
+                    Eşleşme oranı: ${(data.confidence * 100).toFixed(1)}%
+                  </p>
+                </div>
+              `;
+            } else {
+              resultDiv.innerHTML = `
+                <div style="background:rgba(239,68,68,0.1);border:1px solid var(--danger);border-radius:8px;padding:1rem;">
+                  <p style="color:var(--danger);font-weight:600;">❌ ${data.message}</p>
+                  <p style="color:var(--muted);font-size:0.875rem;margin-top:0.5rem;">
+                    Benzerlik: ${(data.confidence * 100).toFixed(1)}% (Eşik: ${(data.threshold * 100).toFixed(0)}%)
+                  </p>
+                </div>
+              `;
+            }
+          } catch (err) {
+            resultDiv.innerHTML = '<p style="color:var(--danger);">Test başarısız</p>';
+          }
+          
+          btn.classList.remove('recording');
+          btn.textContent = '🔊 Test Et';
+        };
+        
+        testRecorder.start();
+        
+        setTimeout(() => {
+          if (testRecorder.state === 'recording') {
+            testRecorder.stop();
+            testRecorder.stream.getTracks().forEach(t => t.stop());
+          }
+        }, 4000);
+        
+      } catch (err) {
+        showToast('Mikrofon erişimi yok', 'error');
+        btn.classList.remove('recording');
+        btn.textContent = '🔊 Test Et';
+      }
+    }
+    
     // ========== COMMAND PROCESSING ==========
     async function processVoiceCommand(text) {
       const type = document.getElementById('voice-modal').dataset.type;
@@ -527,23 +718,19 @@
         let endpoint, body, successMsg;
         
         if (type === 'note' || type === 'command') {
-          // Ses kaydı olarak gönder
           endpoint = '/voice/process-text';
-          body = { text, timezone: 'Europe/Istanbul' };
+          body = JSON.stringify({text, timezone: 'Europe/Istanbul'});
           successMsg = 'Not kaydedildi!';
         } else if (type === 'reminder') {
-          // Hatırlatıcı oluştur
           endpoint = '/reminders/voice';
-          body = { text, timezone: 'Europe/Istanbul' };
+          body = JSON.stringify({text, timezone: 'Europe/Istanbul'});
           successMsg = 'Hatırlatıcı kuruldu!';
         } else if (type === 'task') {
-          // Görev oluştur
-          endpoint = '/tasks/voice';
-          body = { text, timezone: 'Europe/Istanbul' };
+          endpoint = '/voice/process-text';
+          body = JSON.stringify({text, timezone: 'Europe/Istanbul'});
           successMsg = 'Görev eklendi!';
         }
         
-        // API çağrısı (eğer endpoint varsa)
         if (endpoint) {
           const res = await fetch(API + endpoint, {
             method: 'POST',
@@ -551,18 +738,18 @@
               'Authorization': 'Bearer ' + token,
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(body)
+            body: body
           });
           
           if (res.ok) {
-            showSuccessResult(successMsg, text);
+            const data = await res.json();
+            showSuccessResult(data.message || successMsg, text);
             refreshData();
           } else {
             throw new Error('API error');
           }
         }
       } catch(e) {
-        // Fallback: Ses metnini ses kaydı olarak kaydet
         showSuccessResult('Not kaydedildi (işlenecek)', text);
       }
     }
@@ -589,6 +776,15 @@
       document.getElementById('voice-widget').classList.add('hidden');
     }
     
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+      document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+      document.getElementById('voice-auth-section').classList.toggle('hidden', tab !== 'voiceauth');
+    }
+    
     async function showApp() {
       document.getElementById('auth-view').classList.add('hidden');
       document.getElementById('app-view').classList.remove('hidden');
@@ -601,6 +797,7 @@
       } catch(e) {}
       
       refreshData();
+      loadSpeakerProfiles();
     }
     
     async function doLogin(e) {
@@ -666,14 +863,6 @@
       location.reload();
     }
     
-    // ========== UI ==========
-    function showTab(tab) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      event.target.classList.add('active');
-      document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
-      document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
-    }
-    
     function showPanel(panel) {
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       event.target.classList.add('active');
@@ -682,6 +871,7 @@
       
       if (panel === 'reminders') loadReminders();
       if (panel === 'tasks') loadTasks();
+      if (panel === 'speaker') loadSpeakerProfiles();
     }
     
     function showToast(msg, type='success') {
@@ -755,11 +945,6 @@
       } catch(e) { list.innerHTML = '<div class="empty"><p>Hata</p></div>'; }
     }
     
-    async function loadGraph() {
-      // Basit implementasyon
-      document.getElementById('graph-viz').innerHTML = '<div class="graph-placeholder">Graph hazırlanıyor...</div>';
-    }
-    
     function refreshData() {
       loadCalendar();
       loadVoices();
@@ -770,7 +955,6 @@
     
     // ========== AUDIO RECORDING ==========
     async function startRec() {
-      const btn = document.getElementById('rec-btn');
       const status = document.getElementById('status');
       try {
         const stream = await navigator.mediaDevices.getUserMedia({audio: true});
@@ -797,7 +981,6 @@
           }
         };
         recorder.start();
-        btn.classList.add('recording');
         status.textContent = 'Kaydediyor...';
       } catch(err) {
         showToast('Mikrofon erişimi yok', 'error');
@@ -805,10 +988,8 @@
     }
     
     function stopRec() {
-      const btn = document.getElementById('rec-btn');
       if(recorder && recorder.state === 'recording') {
         recorder.stop();
-        btn.classList.remove('recording');
         recorder.stream.getTracks().forEach(t => t.stop());
       }
     }
