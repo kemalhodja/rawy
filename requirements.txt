@@ -17,3 +17,12 @@ transformers==4.46.3
 stripe==11.6.0
 bcrypt==4.1.2
 fastapi-users==13.0.0
+
+# Speaker Recognition
+numpy==1.26.4
+librosa==0.10.1
+soundfile==0.12.1
+
+# Optional: SpeechBrain (ağır bağımlılık, gerekirse)
+# speechbrain==0.5.16
+torchaudio==2.1.2

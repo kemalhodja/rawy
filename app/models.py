@@ -363,3 +363,57 @@ class Reminder(Base):
     user = relationship("User")
     source_voice_note = relationship("VoiceNote")
     linked_task = relationship("Task")
+
+
+class VoiceEmbedding(Base):
+    """Kullanıcı ses izdüşümü (Speaker Recognition)"""
+    __tablename__ = "voice_embeddings"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    # Ses embedding vektörü (192 veya 256 boyutlu)
+    embedding_vector = Column(JSON, nullable=False)  # [0.023, -0.15, ...]
+    embedding_model = Column(String(50), nullable=False, default="ecapa_tdnn")  # Kullanılan model
+    
+    # Kaynak ses
+    source_voice_note_id = Column(Integer, ForeignKey("voice_notes.id", ondelete="SET NULL"), nullable=True)
+    sample_duration = Column(Float, nullable=True)  # Kaç saniyelik örnek
+    
+    # Metadata
+    is_active = Column(Boolean, default=True)  # Aktif mi (eski kayıtlar pasif olabilir)
+    confidence_score = Column(Float, nullable=True)  # Enrollment kalitesi (0-1)
+    
+    # Speaker ID (toplantılarda kullanılmak üzere)
+    speaker_label = Column(String(100), nullable=True)  # "Ali", "User_123", vb.
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    user = relationship("User")
+    source_voice_note = relationship("VoiceNote")
+
+
+class SpeakerSegment(Base):
+    """Toplantı transkriptindeki konuşmacı segmentleri"""
+    __tablename__ = "speaker_segments"
+
+    id = Column(Integer, primary_key=True)
+    voice_note_id = Column(Integer, ForeignKey("voice_notes.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    # Zaman aralığı
+    start_time = Column(Float, nullable=False)  # saniye
+    end_time = Column(Float, nullable=False)  # saniye
+    
+    # Tanımlanan konuşmacı
+    speaker_id = Column(Integer, ForeignKey("voice_embeddings.id", ondelete="SET NULL"), nullable=True)
+    speaker_label = Column(String(100), nullable=True)  # "Ali", "Speaker_1"
+    
+    # Metin
+    transcript = Column(Text, nullable=True)
+    confidence = Column(Float, nullable=True)  # Tanıma güveni
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    voice_note = relationship("VoiceNote")
+    speaker = relationship("VoiceEmbedding")

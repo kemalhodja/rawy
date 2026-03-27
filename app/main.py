@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app import models  # noqa: F401
 from app.config import settings
-from app.routers import api, assistant, auth, billing, calendar, focus, graph, health, meetings, reminders, saml, tasks, voice, workspace
+from app.routers import api, assistant, auth, billing, calendar, focus, graph, health, meetings, reminders, saml, speaker, tasks, voice, workspace
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = ROOT_DIR / "static"
@@ -45,6 +45,7 @@ app.include_router(workspace.router, tags=["workspaces"])
 app.include_router(api.router)
 app.include_router(saml.router)
 app.include_router(meetings.router)
+app.include_router(speaker.router)
 
 
 @app.get("/")
