@@ -8,7 +8,9 @@ services:
       - key: PORT
         value: 8000
       - key: DATABASE_URL
-        value: sqlite:///./rawy.db
+        fromDatabase:
+          name: rawy-db
+          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: JWT_ALGORITHM
@@ -39,5 +41,11 @@ services:
         sync: false
     disk:
       name: data
-      mountPath: /app
+      mountPath: /app/data
       sizeGB: 1
+
+databases:
+  - name: rawy-db
+    plan: free
+    databaseName: rawy
+    user: rawy

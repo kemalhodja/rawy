@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     APP_NAME: str = "Rawy"
     DEBUG: bool = True
 
-    # Database
-    DATABASE_URL: str = "postgresql://rawy:rawy@localhost:5432/rawy"
+    # Database (SQLite for local, PostgreSQL for production)
+    DATABASE_URL: str = "sqlite:///./rawy.db"
 
     # Storage
     UPLOAD_DIR: Path = Path("uploads")
