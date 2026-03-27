@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
+import re
+from zoneinfo import ZoneInfo
 
 from sqlalchemy.orm import Session
 
@@ -61,3 +63,55 @@ def validate_focus_duration(hours: float) -> None:
         raise ValueError(
             f"Odak bloğu {lo:g}-{hi:g} saat arasında olmalı (şu an {hours:.2f} saat)"
         )
+
+
+def _extract_day_anchor(text: str, now_local: datetime) -> date:
+    t = text.lower()
+    d = now_local.date()
+    if any(x in t for x in ("yarın", "yarin", "tomorrow")):
+        return d + timedelta(days=1)
+    if any(x in t for x in ("bugün", "bugun", "today")):
+        return d
+    return d
+
+
+def _extract_single_hour(text: str) -> int | None:
+    # "yarın 3'te", "tomorrow at 15", "bugun saat 9"
+    m = re.search(r"(?:saat\s+|at\s+)?(\d{1,2})\s*(?:'te|'ta|te|ta)?", text.lower())
+    if not m:
+        return None
+    h = int(m.group(1))
+    return h if 0 <= h <= 23 else None
+
+
+def _extract_duration_hours(text: str) -> float:
+    t = text.lower()
+    m = re.search(r"(\d+(?:[.,]\d+)?)\s*saat", t)
+    if m:
+        return max(0.5, float(m.group(1).replace(",", ".")))
+    return 1.0
+
+
+def parse_event_from_voice(text: str, user_timezone: str) -> tuple[datetime, datetime, str, bool]:
+    """
+    Parse phrases like:
+    - "Yarın 3'te"
+    - "2 saatlik yazı bloğu"
+    """
+    if not text or not text.strip():
+        raise ValueError("Metin boş")
+
+    tz = ZoneInfo(user_timezone)
+    now = datetime.now(tz)
+    day = _extract_day_anchor(text, now)
+    hour = _extract_single_hour(text)
+    if hour is None:
+        raise ValueError("Saat bilgisi bulunamadı (örn: 'Yarın 3'te')")
+
+    start = datetime.combine(day, time(hour=hour, minute=0), tzinfo=tz)
+    duration_h = _extract_duration_hours(text)
+    end = start + timedelta(hours=duration_h)
+    title = text.strip()[:500]
+    low = text.lower()
+    is_focus = any(token in low for token in ("blok", "bloğu", "blogu", "focus", "odak"))
+    return start, end, title, is_focus

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Rawy Test</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+    button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    .success { color: green; }
+    .error { color: red; }
+    pre { background: #f5f5f5; padding: 10px; overflow: auto; }
+  </style>
+</head>
+<body>
+  <h1>Rawy API Test</h1>
+  <p>API URL: <span id="api-url"></span></p>
+  
+  <button onclick="testHealth()">Test Health</button>
+  <button onclick="testLogin()">Test Login</button>
+  
+  <div id="result"></div>
+
+  <script>
+    const API = window.location.origin;
+    document.getElementById('api-url').textContent = API;
+    
+    async function testHealth() {
+      const result = document.getElementById('result');
+      result.innerHTML = '<p>Testing...</p>';
+      
+      try {
+        const resp = await fetch(API + '/health/');
+        const data = await resp.json();
+        result.innerHTML = '<p class="success">✓ Health OK: ' + JSON.stringify(data) + '</p>';
+      } catch (err) {
+        result.innerHTML = '<p class="error">✗ Health Error: ' + err.message + '</p>' +
+                          '<pre>' + err.stack + '</pre>';
+      }
+    }
+    
+    async function testLogin() {
+      const result = document.getElementById('result');
+      result.innerHTML = '<p>Testing login...</p>';
+      
+      try {
+        const resp = await fetch(API + '/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: 'test2@rawy.app', password: 'Test12345!' })
+        });
+        
+        if (resp.ok) {
+          const data = await resp.json();
+          result.innerHTML = '<p class="success">✓ Login OK! Token received.</p>' +
+                            '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+        } else {
+          const text = await resp.text();
+          result.innerHTML = '<p class="error">✗ Login failed: ' + resp.status + '</p>' +
+                            '<pre>' + text + '</pre>';
+        }
+      } catch (err) {
+        result.innerHTML = '<p class="error">✗ Login Error: ' + err.message + '</p>' +
+                          '<pre>' + err.stack + '</pre>';
+      }
+    }
+  </script>
+</body>
+</html>

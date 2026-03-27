@@ -37,3 +37,9 @@ def issue_token_pair(user_id: int) -> dict[str, str]:
         "refresh_token": create_refresh_token(sid),
         "token_type": "bearer",
     }
+
+
+def create_email_verify_token(subject: str) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(hours=24)
+    to_encode = {"sub": subject, "exp": expire, "typ": "verify_email"}
+    return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)

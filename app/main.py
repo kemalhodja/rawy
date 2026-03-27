@@ -1,12 +1,13 @@
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app import models  # noqa: F401
 from app.config import settings
-from app.routers import assistant, auth, billing, calendar, focus, health, tasks, voice
+from app.routers import api, assistant, auth, billing, calendar, focus, graph, health, meetings, saml, tasks, voice, workspace
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = ROOT_DIR / "static"
@@ -16,6 +17,15 @@ app = FastAPI(
     description="Voice-first knowledge operating system",
     version="0.1.0",
     debug=settings.DEBUG,
+)
+
+# CORS - allow all origins for development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 if STATIC_DIR.is_dir():
@@ -29,6 +39,11 @@ app.include_router(voice.router, prefix="/voice", tags=["voice"])
 app.include_router(calendar.router, prefix="/calendar", tags=["calendar"])
 app.include_router(focus.router, prefix="/focus", tags=["focus"])
 app.include_router(tasks.router, prefix="/tasks", tags=["tasks"])
+app.include_router(graph.router, tags=["knowledge-graph"])
+app.include_router(workspace.router, tags=["workspaces"])
+app.include_router(api.router)
+app.include_router(saml.router)
+app.include_router(meetings.router)
 
 
 @app.get("/")

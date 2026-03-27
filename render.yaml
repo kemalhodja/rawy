@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: rawy
+    runtime: docker
+    plan: standard
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: DATABASE_URL
+        value: sqlite:///./rawy.db
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 10080
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 30
+      - key: WHISPER_MODEL
+        value: base
+      - key: WHISPER_DEVICE
+        value: cpu
+      - key: WHISPER_COMPUTE_TYPE
+        value: int8
+      - key: AI_SUMMARY_MODEL
+        value: facebook/bart-large-cnn
+      - key: AI_ZERO_SHOT_MODEL
+        value: facebook/bart-large-mnli
+      - key: AI_SENTIMENT_MODEL
+        value: cardiffnlp/twitter-roberta-base-sentiment-latest
+      - key: APP_PUBLIC_URL
+        value: https://rawy.onrender.com
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_PRO_MONTHLY
+        sync: false
+    disk:
+      name: data
+      mountPath: /app
+      sizeGB: 1

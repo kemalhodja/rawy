@@ -39,5 +39,29 @@ class Settings(BaseSettings):
     TRIAL_DAYS: int = 14
     STARTER_VOICE_MONTHLY_LIMIT: int = 50
 
+    # Google Calendar (opsiyonel 2-way sync)
+    GOOGLE_CALENDAR_ENABLED: bool = False
+    GOOGLE_CLIENT_ID: str | None = None
+    GOOGLE_CLIENT_SECRET: str | None = None
+
+    # Smart AI (Transformers)
+    AI_SUMMARY_MODEL: str = "facebook/bart-large-cnn"
+    AI_ZERO_SHOT_MODEL: str = "facebook/bart-large-mnli"
+    AI_SENTIMENT_MODEL: str = "cardiffnlp/twitter-roberta-base-sentiment-latest"
+
+    # Weekly email report (optional)
+    WEEKLY_EMAIL_REPORT_ENABLED: bool = False
+    SMTP_HOST: str | None = None
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str | None = None
+    SMTP_PASSWORD: str | None = None
+    SMTP_FROM: str | None = None
+
+    # Billing / Stripe
+    STRIPE_SECRET_KEY: str | None = None
+    STRIPE_WEBHOOK_SECRET: str | None = None
+    STRIPE_PRICE_PRO_MONTHLY: str | None = None
+    APP_PUBLIC_URL: str = "http://localhost:8000"
+
 
 settings = Settings()

@@ -18,6 +18,7 @@ class UserOut(BaseModel):
     email: str
     plan: str
     is_active: bool
+    is_verified: bool = False
     timezone: str
     created_at: datetime | None
 
@@ -33,6 +34,11 @@ class Token(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
+
+
+class RegisterOut(BaseModel):
+    user: UserOut
+    verify_token: str
 
 
 class RefreshBody(BaseModel):

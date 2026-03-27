@@ -6,6 +6,7 @@ from datetime import timezone as dt_timezone
 import pytest
 
 from app.services.note_graph_insights import extract_wikilinks, pair_theme_analysis
+from app.services.calendar_logic import parse_event_from_voice
 from app.services.recording_types import normalize_recording_type
 from app.services.task_flow import nudge_cooldown_active, nudge_cooldown_until
 from app.services.voice_deadline import parse_task_deadline
@@ -51,3 +52,13 @@ def test_nudge_cooldown():
         last_task_nudge_at = None
 
     assert nudge_cooldown_active(MockUser2()) is False
+
+
+def test_parse_event_from_voice_tomorrow_hour_and_duration():
+    start, end, title, is_focus = parse_event_from_voice(
+        "Yarin 3'te 2 saatlik yazi blogu", "Europe/Istanbul"
+    )
+    assert start.hour == 3
+    assert int((end - start).total_seconds() / 3600) == 2
+    assert "Yarin" in title
+    assert is_focus is True

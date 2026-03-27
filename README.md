@@ -75,6 +75,29 @@ python -m pytest tests/ -q
 DATABASE_URL=postgresql://rawy:rawy@localhost:5432/rawy python scripts/smoke_pg.py
 ```
 
+## Smart AI Features
+
+- Daily summary from all notes: `GET /assistant/daily-summary`
+- Weekly themes (word frequency + zero-shot): `GET /assistant/weekly-themes`
+- Optional weekly email report: `POST /assistant/weekly-email-report`
+
+Required dependency:
+
+```bash
+pip install transformers==4.46.3
+```
+
+Email report is optional and enabled only when SMTP env vars are configured.
+
+## Production Deploy
+
+- Docker: `Dockerfile` (app container)
+- Compose stack: app + PostgreSQL + Redis (`docker-compose.yml`)
+- Railway config: `railway.json`
+- Fly config: `fly.toml`
+- Postman smoke: `postman_collection.json`
+- Beta rollout checklist: `BETA_CHECKLIST.md`
+
 ## Notes
 
 - `uploads/` contains user audio files and is ignored by git except `.gitkeep`.

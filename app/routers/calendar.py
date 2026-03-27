@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.config import settings
 from app.database import get_db
 from app.deps import get_current_user
-from app.models import FocusBlock, User
+from app.models import CalendarEvent, FocusBlock, User, VoiceNote
 from app.schemas import (
     AvailabilityMapOut,
     FocusBlockCreate,
@@ -19,9 +19,11 @@ from app.schemas import (
 from app.services.calendar_logic import (
     apply_buffer_before_start,
     focus_duration_hours,
+    parse_event_from_voice,
     validate_focus_duration,
 )
 from app.services.focus_mode import get_current_block
+from app.services.google_calendar_service import google_calendar_service
 from app.services.voice_planning import parse_voice_planning
 
 router = APIRouter()
@@ -36,6 +38,125 @@ def _to_out(b: FocusBlock) -> FocusBlockOut:
         is_focus=b.is_focus,
         source=b.source,
     )
+
+
+@router.post("/from-voice/{note_id}")
+def create_event_from_voice(
+    note_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    note = (
+        db.query(VoiceNote)
+        .filter(VoiceNote.id == note_id, VoiceNote.user_id == current_user.id)
+        .first()
+    )
+    if not note:
+        raise HTTPException(404, "Not bulunamadı")
+    if not note.transcript:
+        raise HTTPException(422, "Notta transkript yok")
+
+    tz = current_user.timezone or "UTC"
+    try:
+        start, end, title, is_focus = parse_event_from_voice(note.transcript, tz)
+    except ValueError as e:
+        raise HTTPException(422, str(e)) from e
+
+    event = CalendarEvent(
+        user_id=current_user.id,
+        title=title,
+        start_time=start,
+        end_time=end,
+        source_note_id=note.id,
+        is_focus_block=is_focus,
+    )
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+
+    sync_result = google_calendar_service.push_event(
+        title=event.title,
+        start_time=event.start_time,
+        end_time=event.end_time,
+        user_id=current_user.id,
+    )
+    if sync_result.get("synced"):
+        event.external_event_id = sync_result.get("external_event_id")
+        db.commit()
+        db.refresh(event)
+
+    return {
+        "id": event.id,
+        "title": event.title,
+        "start_time": event.start_time,
+        "end_time": event.end_time,
+        "source_note_id": event.source_note_id,
+        "is_focus_block": event.is_focus_block,
+        "google_sync": sync_result,
+    }
+
+
+@router.get("/")
+def weekly_calendar_view(
+    week_start: date | None = Query(None, description="Hafta başlangıcı YYYY-MM-DD"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    tz_name = current_user.timezone or "UTC"
+    tz = ZoneInfo(tz_name)
+    today = datetime.now(tz).date()
+    ws = week_start or (today - timedelta(days=today.weekday()))
+    start = datetime.combine(ws, time.min, tzinfo=tz)
+    end = start + timedelta(days=7)
+
+    events = (
+        db.query(CalendarEvent)
+        .filter(
+            CalendarEvent.user_id == current_user.id,
+            CalendarEvent.start_time < end,
+            CalendarEvent.end_time > start,
+        )
+        .order_by(CalendarEvent.start_time.asc())
+        .all()
+    )
+
+    blocks = (
+        db.query(FocusBlock)
+        .filter(
+            FocusBlock.user_id == current_user.id,
+            FocusBlock.start_at < end,
+            FocusBlock.end_at > start,
+        )
+        .order_by(FocusBlock.start_at.asc())
+        .all()
+    )
+
+    return {
+        "week_start": ws.isoformat(),
+        "week_end": (ws + timedelta(days=6)).isoformat(),
+        "events": [
+            {
+                "id": e.id,
+                "title": e.title,
+                "start_time": e.start_time,
+                "end_time": e.end_time,
+                "source_note_id": e.source_note_id,
+                "is_focus_block": e.is_focus_block,
+                "external_event_id": e.external_event_id,
+            }
+            for e in events
+        ],
+        "focus_blocks": [
+            {
+                "id": b.id,
+                "title": b.title,
+                "start_at": b.start_at,
+                "end_at": b.end_at,
+                "source": b.source,
+            }
+            for b in blocks
+        ],
+    }
 
 
 @router.post("/blocks", response_model=FocusBlockOut)

@@ -159,3 +159,7 @@ def plans_catalog() -> dict[str, Any]:
             },
         ],
     }
+
+
+def stripe_enabled() -> bool:
+    return bool(settings.STRIPE_SECRET_KEY and settings.STRIPE_PRICE_PRO_MONTHLY)

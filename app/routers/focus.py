@@ -106,7 +106,12 @@ def focus_enter(
     if not blk:
         raise HTTPException(404, "Blok bulunamadı")
     now = now_in_tz(current_user)
-    if now >= blk.end_at:
+    # SQLite timezone uyumluluğu için
+    blk_end = blk.end_at
+    if blk_end.tzinfo is None:
+        from datetime import timezone
+        blk_end = blk_end.replace(tzinfo=timezone.utc)
+    if now >= blk_end:
         raise HTTPException(400, "Blok süresi dolmuş; yeni bir blok seçin")
 
     enter_focus_session(db, current_user, body.block_id)

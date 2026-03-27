@@ -12,8 +12,8 @@ from app.config import settings
 from app.database import get_db
 from app.deps import get_current_user
 from app.models import User
-from app.schemas import LoginBody, RefreshBody, Token, UserCreate, UserOut, UserProfilePatch
-from app.security import get_password_hash, issue_token_pair, verify_password
+from app.schemas import LoginBody, RefreshBody, RegisterOut, Token, UserCreate, UserOut, UserProfilePatch
+from app.security import create_email_verify_token, get_password_hash, issue_token_pair, verify_password
 
 router = APIRouter()
 
@@ -31,8 +31,8 @@ def _authenticate_user(db: Session, email: str, password: str) -> User:
     return user
 
 
-@router.post("/register", response_model=UserOut)
-def register(data: UserCreate, db: Session = Depends(get_db)) -> User:
+@router.post("/register", response_model=RegisterOut)
+def register(data: UserCreate, db: Session = Depends(get_db)) -> dict:
     if db.query(User).filter(User.email == data.email.lower()).first():
         raise HTTPException(status_code=400, detail="Bu e-posta zaten kayıtlı")
 
@@ -41,6 +41,7 @@ def register(data: UserCreate, db: Session = Depends(get_db)) -> User:
         email=data.email.lower(),
         hashed_password=get_password_hash(data.password),
         is_active=True,
+        is_verified=False,
         plan="starter",
         trial_ends_at=trial_end,
         timezone=data.timezone,
@@ -48,7 +49,8 @@ def register(data: UserCreate, db: Session = Depends(get_db)) -> User:
     db.add(user)
     db.commit()
     db.refresh(user)
-    return user
+    verify_token = create_email_verify_token(str(user.id))
+    return {"user": user, "verify_token": verify_token}
 
 
 @router.post("/login", response_model=Token)
@@ -123,3 +125,28 @@ def update_me(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+@router.post("/verify-email")
+def verify_email(
+    token: str,
+    db: Session = Depends(get_db),
+):
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Geçersiz doğrulama tokenı") from None
+    if payload.get("typ") != "verify_email":
+        raise HTTPException(status_code=401, detail="Geçersiz doğrulama tokenı")
+    sub = payload.get("sub")
+    try:
+        user_id = int(sub)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Geçersiz doğrulama tokenı") from None
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Kullanıcı bulunamadı")
+    user.is_verified = True
+    db.commit()
+    return {"verified": True}
