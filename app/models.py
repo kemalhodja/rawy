@@ -319,3 +319,47 @@ class MeetingBot(Base):
     
     user = relationship("User")
     workspace = relationship("Workspace")
+
+
+class Reminder(Base):
+    """Hatırlatıcı / Alarm sistemi"""
+    __tablename__ = "reminders"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    
+    # Hatırlatıcı içeriği
+    title = Column(String(255), nullable=False)  # "Su iç", "Toplantı", "İlaç"
+    note = Column(Text, nullable=True)  # Detaylı not
+    
+    # Zamanlama
+    remind_at = Column(DateTime(timezone=True), nullable=False, index=True)  # Ne zaman hatırlat
+    timezone = Column(String(64), nullable=False, default="UTC")
+    
+    # Tekrar (recurrence)
+    recurrence = Column(String(20), nullable=True)  # null, "daily", "weekly", "monthly"
+    recurrence_count = Column(Integer, nullable=True)  # Kaç kez tekrar edecek (null = sonsuz)
+    
+    # Durumlar
+    is_triggered = Column(Boolean, default=False)  # Alarm çaldı mı?
+    is_dismissed = Column(Boolean, default=False)  # Kullanıcı kapat/kapat dedi mi?
+    is_snoozed = Column(Boolean, default=False)  # Erteleme aktif mi?
+    snooze_until = Column(DateTime(timezone=True), nullable=True)  # Erteleme ne zamana
+    
+    # Bildirim tercihleri
+    notify_methods = Column(JSON, default=list)  # ["push", "email", "voice"]
+    
+    # İlişkiler
+    source_voice_note_id = Column(Integer, ForeignKey("voice_notes.id", ondelete="SET NULL"), nullable=True)
+    linked_task_id = Column(Integer, ForeignKey("tasks.id", ondelete="SET NULL"), nullable=True)
+    
+    # İstatistik
+    trigger_count = Column(Integer, default=0)  # Kaç kez hatırlatıldı
+    last_triggered_at = Column(DateTime(timezone=True), nullable=True)
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    user = relationship("User")
+    source_voice_note = relationship("VoiceNote")
+    linked_task = relationship("Task")

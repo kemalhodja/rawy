@@ -11,30 +11,48 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.models import FocusBlock, Task, User, VoiceNote
+from app.models import FocusBlock, Reminder, Task, User, VoiceNote
 from app.services.calendar_logic import apply_buffer_before_start, focus_duration_hours
 from app.services.voice_deadline import has_deadline_speech, parse_task_deadline
 from app.services.voice_planning import has_time_range, parse_voice_planning
 
 
 def classify_transcript(text: str) -> str:
-    """Dönüş: calendar | task | note"""
+    """Dönüş: calendar | task | reminder | note"""
     t = text.lower()
+    
+    # Hatırlatıcı/Alarm anahtar kelimeleri
+    reminder_kw = (
+        "alarm kur",
+        "alarm",
+        "hatırlatıcı",
+        "hatirlat",
+        "hatırlat",
+        "remind me",
+        "reminder",
+        "bana hatırlat",
+        "beni uyar",
+        "uyar",
+        "zikir çek",
+        "animsat",
+    )
+    
     task_kw = (
         "yapılacak",
         "yapilacak",
         "görev",
         "gorev",
-        "hatırlat",
-        "hatirlat",
         "todo",
         "unutma",
         "deadline",
-        "remind",
         "listeme ekle",
         "alıyorum",
     )
 
+    # Önce hatırlatıcı mı kontrol et (en spesifik)
+    if any(k in t for k in reminder_kw):
+        return "reminder"
+    
     if has_time_range(text):
         return "calendar"
     if any(k in t for k in task_kw) or has_deadline_speech(text):
@@ -141,6 +159,50 @@ def run_intent_pipeline(db: Session, note_id: int) -> dict:
             result["focus_block_id"] = block.id
             result["adjusted_for_buffer"] = adjusted
 
+        elif category == "reminder":
+            # Hatırlatıcı oluştur
+            from app.services.voice_deadline import parse_deadline_from_voice
+            
+            t_title = extract_task_title(text)
+            remind_at = parse_deadline_from_voice(text, tz)
+            
+            # Tekrar kontrolü
+            recurrence = None
+            recurrence_keywords = {
+                "her gün": "daily", "hergun": "daily",
+                "her hafta": "weekly", "herhafta": "weekly",
+                "her ay": "monthly", "heray": "monthly",
+            }
+            for keyword, rec_type in recurrence_keywords.items():
+                if keyword in text.lower():
+                    recurrence = rec_type
+                    break
+            
+            # Başlık temizleme
+            clean_words = ["hatırlat", "hatırlatıcı", "alarm", "kur", "bana", "beni", "uyar", "remind", "reminder"]
+            for word in clean_words:
+                t_title = t_title.replace(word, "").replace(word.capitalize(), "")
+            t_title = " ".join(t_title.split()).strip()
+            if not t_title:
+                t_title = "Hatırlatıcı"
+            
+            reminder = Reminder(
+                user_id=user.id,
+                title=t_title[:255],
+                note=text[:2000],
+                remind_at=remind_at,
+                timezone=tz,
+                recurrence=recurrence,
+                source_voice_note_id=note.id,
+                notify_methods=["push", "voice"],
+            )
+            db.add(reminder)
+            db.flush()
+            
+            result["reminder_id"] = reminder.id
+            result["remind_at"] = remind_at.isoformat() if remind_at else None
+            result["recurrence"] = recurrence
+            
         elif category == "task" and (note.recording_type or "") == "meeting":
             result["task_skipped"] = "meeting_action_items"
             result["note_only"] = True

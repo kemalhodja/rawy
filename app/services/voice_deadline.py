@@ -41,6 +41,70 @@ def _parse_hour_minute(text: str) -> tuple[int, int] | None:
     return None
 
 
+def parse_deadline_from_voice(text: str, user_timezone: str = "UTC") -> datetime:
+    """
+    Sesli komuttan deadline çıkar. Bulunamazsa şimdiden 1 saat sonrasını döndür.
+    Örnek: "3 saat sonra", "yarın saat 9", "5 dakika sonra"
+    """
+    if not text or not text.strip():
+        from datetime import timezone as tz
+        return datetime.now(tz.utc) + timedelta(hours=1)
+    
+    tz = ZoneInfo(user_timezone)
+    now = datetime.now(tz)
+    t = text.lower()
+    
+    # "X saat/dakika sonra"
+    relative_match = re.search(r'(\d+)\s*(saat|dakika|dk|hour|minute|min)\s*sonra', t)
+    if relative_match:
+        amount = int(relative_match.group(1))
+        unit = relative_match.group(2)
+        if unit in ('saat', 'hour'):
+            return now + timedelta(hours=amount)
+        else:
+            return now + timedelta(minutes=amount)
+    
+    # "yarın", "bugün" + saat
+    day = _day_anchor(text, now)
+    hm = _parse_hour_minute(text)
+    
+    if hm:
+        h, m = hm
+        return datetime.combine(day, time(h, m), tzinfo=tz)
+    
+    # Sadece "yarın" → yarın aynı saat
+    if any(x in t for x in ("yarın", "yarin", "tomorrow")):
+        tomorrow = now.date() + timedelta(days=1)
+        return datetime.combine(tomorrow, now.time().replace(minute=0, second=0, microsecond=0), tzinfo=tz)
+    
+    # "bugün" → bugün aynı saat (eğer geçmediyse) veya +1 saat
+    if any(x in t for x in ("bugün", "bugun", "today")):
+        today_time = datetime.combine(now.date(), time(now.hour + 1, 0), tzinfo=tz)
+        if today_time <= now:
+            today_time = now + timedelta(hours=1)
+        return today_time
+    
+    # Öğle / Akşam / Sabah
+    if "öğlene" in t or "ogleye" in t or "öğlen" in t:
+        return datetime.combine(day, time(12, 0), tzinfo=tz)
+    
+    if "akşam" in t or "aksam" in t:
+        hm = _parse_hour_minute(text)
+        if hm:
+            h, m = hm
+        else:
+            h, m = 18, 0
+        return datetime.combine(day, time(h, m), tzinfo=tz)
+    
+    if "sabah" in t:
+        hm = _parse_hour_minute(text)
+        h, m = (hm if hm else (9, 0))
+        return datetime.combine(day, time(h, m), tzinfo=tz)
+    
+    # Varsayılan: 1 saat sonra
+    return now + timedelta(hours=1)
+
+
 def has_deadline_speech(text: str) -> bool:
     """Görev + son tarih niyeti (takvim aralığından ayrı)."""
     if not text or not text.strip():
