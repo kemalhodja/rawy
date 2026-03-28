@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,8 +10,17 @@ from app import models  # noqa: F401
 from app.config import settings
 from app.routers import api, assistant, auth, billing, calendar, focus, graph, health, meetings, reminders, saml, speaker, tasks, voice, workspace
 
+# Static dosya dizinini bul
 ROOT_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = ROOT_DIR / "static"
+
+# Eğer static klasörü yoksa, çalışma dizininde dene
+if not STATIC_DIR.is_dir():
+    STATIC_DIR = Path("/app/static")
+if not STATIC_DIR.is_dir():
+    STATIC_DIR = Path.cwd() / "static"
+
+print(f"Static directory: {STATIC_DIR} (exists: {STATIC_DIR.is_dir()})")
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -28,8 +38,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Static dosyaları mount et
 if STATIC_DIR.is_dir():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+    print(f"Static files mounted at: {STATIC_DIR}")
+else:
+    print(f"WARNING: Static directory not found: {STATIC_DIR}")
 
 app.include_router(assistant.router, prefix="/assistant", tags=["assistant"])
 app.include_router(health.router, prefix="/health", tags=["health"])
@@ -63,6 +77,20 @@ def root():
 def app_shell():
     """Tek sütun arayüz (statik HTML)."""
     index = STATIC_DIR / "index.html"
+    print(f"Looking for index.html at: {index} (exists: {index.is_file()})")
+    
     if not index.is_file():
-        raise HTTPException(404, "static/index.html bulunamadı")
+        # Alternatif konumları dene
+        alt_paths = [
+            Path("/app/static/index.html"),
+            Path.cwd() / "static" / "index.html",
+            ROOT_DIR / "static" / "index.html",
+        ]
+        for alt in alt_paths:
+            print(f"Trying alternative: {alt} (exists: {alt.is_file()})")
+            if alt.is_file():
+                return FileResponse(alt)
+        
+        raise HTTPException(404, f"static/index.html not found. Searched: {index}, {alt_paths}")
+    
     return FileResponse(index)
