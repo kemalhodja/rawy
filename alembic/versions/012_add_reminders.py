@@ -19,6 +19,11 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    # SQLite batch mode için
+    with op.batch_alter_table('reminders', schema=None) as batch_op:
+        pass
+    
+    # Reminders tablosunu oluştur (batch mode ile)
     op.create_table(
         'reminders',
         sa.Column('id', sa.Integer(), nullable=False),
@@ -46,11 +51,6 @@ def upgrade() -> None:
     # Indexes
     op.create_index(op.f('ix_reminders_user_id'), 'reminders', ['user_id'], unique=False)
     op.create_index(op.f('ix_reminders_remind_at'), 'reminders', ['remind_at'], unique=False)
-    
-    # Foreign keys
-    op.create_foreign_key(None, 'reminders', 'users', ['user_id'], ['id'], ondelete='CASCADE')
-    op.create_foreign_key(None, 'reminders', 'voice_notes', ['source_voice_note_id'], ['id'], ondelete='SET NULL')
-    op.create_foreign_key(None, 'reminders', 'tasks', ['linked_task_id'], ['id'], ondelete='SET NULL')
 
 
 def downgrade() -> None:

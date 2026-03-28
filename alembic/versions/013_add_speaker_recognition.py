@@ -36,8 +36,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_voice_embeddings_user_id'), 'voice_embeddings', ['user_id'], unique=False)
-    op.create_foreign_key(None, 'voice_embeddings', 'users', ['user_id'], ['id'], ondelete='CASCADE')
-    op.create_foreign_key(None, 'voice_embeddings', 'voice_notes', ['source_voice_note_id'], ['id'], ondelete='SET NULL')
     
     # Speaker Segments
     op.create_table(
@@ -54,8 +52,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_speaker_segments_voice_note_id'), 'speaker_segments', ['voice_note_id'], unique=False)
-    op.create_foreign_key(None, 'speaker_segments', 'voice_notes', ['voice_note_id'], ['id'], ondelete='CASCADE')
-    op.create_foreign_key(None, 'speaker_segments', 'voice_embeddings', ['speaker_id'], ['id'], ondelete='SET NULL')
 
 
 def downgrade() -> None:
