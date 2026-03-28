@@ -94,3 +94,53 @@ def app_shell():
         raise HTTPException(404, f"static/index.html not found. Searched: {index}, {alt_paths}")
     
     return FileResponse(index)
+
+
+@app.get("/debug/static")
+def debug_static():
+    """Static dosya yollarını debug et"""
+    paths = {
+        "ROOT_DIR": str(ROOT_DIR),
+        "STATIC_DIR": str(STATIC_DIR),
+        "STATIC_DIR_exists": STATIC_DIR.is_dir(),
+        "index_html": str(STATIC_DIR / "index.html"),
+        "index_html_exists": (STATIC_DIR / "index.html").is_file(),
+        "cwd": str(Path.cwd()),
+        "cwd_static_exists": (Path.cwd() / "static").is_dir(),
+    }
+    
+    # Tüm dosyaları listele
+    files = []
+    if STATIC_DIR.is_dir():
+        try:
+            files = [str(f.name) for f in STATIC_DIR.iterdir()][:20]
+        except Exception as e:
+            files = [f"Error: {e}"]
+    
+    return {
+        "paths": paths,
+        "static_files": files,
+        "manifest_exists": (STATIC_DIR / "manifest.json").is_file(),
+    }
+
+
+@app.get("/test-html")
+def test_html():
+    """Basit HTML test"""
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head><title>Rawy Test</title></head>
+    <body>
+        <h1>Rawy Çalışıyor!</h1>
+        <p>API bağlantısı test ediliyor...</p>
+        <script>
+            fetch('/health').then(r => r.json()).then(d => {
+                document.body.innerHTML += '<p style="color:green">✅ API OK: ' + JSON.stringify(d) + '</p>';
+            }).catch(e => {
+                document.body.innerHTML += '<p style="color:red">❌ API Hatası: ' + e + '</p>';
+            });
+        </script>
+    </body>
+    </html>
+    """
